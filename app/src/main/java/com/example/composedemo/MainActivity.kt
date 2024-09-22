@@ -7,6 +7,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -41,7 +42,8 @@ class MainActivity : ComponentActivity() {
         setContent {
             ComposeDemoTheme {
                 Surface(modifier = Modifier.fillMaxSize()) {
-                    MessageCard(Message("Android", "Jetpack Compose"))
+//                    MessageCard(Message("Android", "Jetpack Compose"))
+                    Conversation(SampleData.conversationSample)
                 }
             }
         }
@@ -52,7 +54,7 @@ class MainActivity : ComponentActivity() {
 data class Message(val author: String, val body: String)
 
 @Composable
-fun MessageCard(msg: Message) {
+public fun MessageCard(msg: Message) {
     // Add padding around our message
     Row(modifier = Modifier.padding(all = 8.dp)) {
         Image(
@@ -65,14 +67,17 @@ fun MessageCard(msg: Message) {
                 .clip(CircleShape)
                 .border(1.5.dp, MaterialTheme.colorScheme.primary, CircleShape)
         )
+        // Add a horizontal space between the image and the column
+        Spacer(modifier = Modifier.width(8.dp))
+
 
         // We keep track if the message is expanded or not in this
         // variable
         var isExpanded by remember { mutableStateOf(false) }
-        // Add a horizontal space between the image and the column
-        Spacer(modifier = Modifier.width(8.dp))
 
-        Column {
+        Column(modifier = Modifier.clickable {
+            isExpanded = !isExpanded
+        }) {
             Text(
                 text = msg.author,
                 color = MaterialTheme.colorScheme.secondary,
@@ -83,7 +88,10 @@ fun MessageCard(msg: Message) {
             Surface(shape = MaterialTheme.shapes.medium, shadowElevation = 1.dp) {
                 Text(
                     text = msg.body, style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.padding(all = 4.dp)
+                    modifier = Modifier.padding(all = 4.dp),
+                    // If the message is expanded, we display all its content
+                    // otherwise we only display the first line
+                    maxLines = if (isExpanded) Int.MAX_VALUE else 1
                 )
             }
 
